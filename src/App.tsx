@@ -134,21 +134,46 @@ export const App: React.FC = () => {
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
+
+    if (id === 'gallery') {
+      setActiveStep('frame');
+      const el = document.getElementById('workflow');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+
+    if (id === 'campaign-info') {
+      const el = document.getElementById('features');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+
     const el = document.getElementById(id);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (id === 'hero') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handleStartFlow = () => {
+    setIsAdminView(false);
+    if (!selectedFrame) {
+      setSelectedFrame(presetFrames[0]);
+    }
+    setActiveStep('frame');
+    scrollToSection('workflow');
   };
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#1F2937] flex flex-col font-sans selection:bg-[#E31E24] selection:text-white">
       
       <Header
-        onStartClick={() => {
-          setIsAdminView(false);
-          setActiveStep('frame');
-          scrollToSection('workflow');
-        }}
+        onStartClick={handleStartFlow}
         onNavigate={(id) => {
           setIsAdminView(false);
           scrollToSection(id);
@@ -171,10 +196,7 @@ export const App: React.FC = () => {
         ) : (
           <>
             <Hero
-              onStartClick={() => {
-                setActiveStep('frame');
-                scrollToSection('workflow');
-              }}
+              onStartClick={handleStartFlow}
               onExploreFrames={() => {
                 setActiveStep('frame');
                 scrollToSection('workflow');
@@ -185,14 +207,15 @@ export const App: React.FC = () => {
 
             <TrustBenefits />
 
-            <CampaignFeatures />
+            <div id="features" className="scroll-mt-24">
+              <CampaignFeatures />
+            </div>
 
-            <AboutCampaign
-              onStartClick={() => {
-                setActiveStep('frame');
-                scrollToSection('workflow');
-              }}
-            />
+            <div id="about" className="scroll-mt-24">
+              <AboutCampaign
+                onStartClick={handleStartFlow}
+              />
+            </div>
 
             <div id="workflow" className="scroll-mt-24">
               <ProgressTracker
@@ -249,10 +272,7 @@ export const App: React.FC = () => {
             </div>
 
             <CallToAction
-              onStartClick={() => {
-                setActiveStep('frame');
-                scrollToSection('workflow');
-              }}
+              onStartClick={handleStartFlow}
               onExploreFrames={() => {
                 setActiveStep('frame');
                 scrollToSection('workflow');
