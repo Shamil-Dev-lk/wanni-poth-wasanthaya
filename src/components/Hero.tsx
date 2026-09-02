@@ -6,39 +6,45 @@ import { soundEffects } from '../utils/soundEffects';
 interface HeroProps {
   onStartClick: () => void;
   onExploreFrames: () => void;
-  samplePreviews: string[];
+  samplePreviews?: string[];
   language?: Language;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   onStartClick,
   onExploreFrames,
-  samplePreviews,
+  samplePreviews = [],
   language = 'en'
 }) => {
   const t = translations[language];
+
+  // Guaranteed fallback to all 3 official campaign sample images
+  const effectivePreviews = (samplePreviews && samplePreviews.length >= 3)
+    ? samplePreviews
+    : ['/assets/sample-1.jpg', '/assets/sample-2.jpg', '/assets/sample-3.jpg'];
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Auto-slide effect every 3 seconds
+  // Auto-slide effect every 2.5 seconds
   useEffect(() => {
-    if (samplePreviews.length <= 1 || isHovered) return;
+    if (isHovered) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % samplePreviews.length);
-    }, 3000);
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % effectivePreviews.length);
+    }, 2500);
 
     return () => clearInterval(interval);
-  }, [samplePreviews, isHovered]);
+  }, [effectivePreviews.length, isHovered]);
 
   const handleNext = () => {
     soundEffects.playClick();
-    setCurrentIndex((prev) => (prev + 1) % samplePreviews.length);
+    setCurrentIndex((prev) => (prev + 1) % effectivePreviews.length);
   };
 
   const handlePrev = () => {
     soundEffects.playClick();
-    setCurrentIndex((prev) => (prev - 1 + samplePreviews.length) % samplePreviews.length);
+    setCurrentIndex((prev) => (prev - 1 + effectivePreviews.length) % effectivePreviews.length);
   };
 
   const handleDotClick = (idx: number) => {
@@ -171,7 +177,7 @@ export const Hero: React.FC<HeroProps> = ({
                     className="flex w-full h-full transition-transform duration-500 ease-out"
                     style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                   >
-                    {samplePreviews.map((imgSrc, idx) => (
+                    {effectivePreviews.map((imgSrc, idx) => (
                       <div key={idx} className="w-full h-full flex-shrink-0 relative">
                         <img
                           src={imgSrc}
@@ -183,7 +189,7 @@ export const Hero: React.FC<HeroProps> = ({
                   </div>
 
                   {/* Previous / Next Arrow Controls */}
-                  {samplePreviews.length > 1 && (
+                  {effectivePreviews.length > 1 && (
                     <>
                       <button
                         onClick={handlePrev}
@@ -205,14 +211,14 @@ export const Hero: React.FC<HeroProps> = ({
 
                   {/* Indicator Counter Badge */}
                   <div className="absolute bottom-2.5 right-2.5 z-20 bg-black/75 text-white text-[10px] font-bold px-3 py-1 rounded-full backdrop-blur-md font-sans">
-                    Sample 0{currentIndex + 1} / 0{samplePreviews.length}
+                    Sample 0{currentIndex + 1} / 0{effectivePreviews.length}
                   </div>
                 </div>
 
                 {/* Clickable Pagination Dots */}
-                {samplePreviews.length > 1 && (
+                {effectivePreviews.length > 1 && (
                   <div className="flex justify-center items-center space-x-2 pt-1">
-                    {samplePreviews.map((_, idx) => (
+                    {effectivePreviews.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleDotClick(idx)}

@@ -42,10 +42,17 @@ export const App: React.FC = () => {
     }
   });
 
+  // Ensure all 3 official sample images are loaded by default
   const [samplePreviews, setSamplePreviews] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('nikaweratiya_ps_sample_previews');
-      return saved ? JSON.parse(saved) : defaultSamplePreviews;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 3) {
+          return parsed;
+        }
+      }
+      return defaultSamplePreviews;
     } catch {
       return defaultSamplePreviews;
     }
