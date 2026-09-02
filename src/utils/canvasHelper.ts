@@ -67,7 +67,7 @@ export function renderCanvasComposition(
   canvas.height = targetSize;
 
   // Clear background with soft off-white
-  ctx.fillStyle = '#FAFAF8';
+  ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, targetSize, targetSize);
 
   const { x, y, width, height, radius, shape } = photoArea;
@@ -152,7 +152,7 @@ export function renderCanvasComposition(
 }
 
 /**
- * Triggers file download in browser.
+ * Universal high-compatibility canvas downloader for Mobile & Desktop.
  */
 export function downloadCanvasImage(
   canvas: HTMLCanvasElement,
@@ -160,12 +160,64 @@ export function downloadCanvasImage(
   filename: string
 ) {
   const mimeType = format === 'png' ? 'image/png' : 'image/jpeg';
-  const dataUrl = canvas.toDataURL(mimeType, format === 'jpeg' ? 0.92 : 1.0);
-  
-  const link = document.createElement('a');
-  link.download = filename.endsWith(`.${format}`) ? filename : `${filename}.${format === 'jpeg' ? 'jpg' : 'png'}`;
-  link.href = dataUrl;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const cleanFilename = filename.endsWith(`.${format === 'jpeg' ? 'jpg' : 'png'}`)
+    ? filename
+    : `${filename}.${format === 'jpeg' ? 'jpg' : 'png'}`;
+
+  // Try Blob URL approach first (highest mobile compatibility)
+  if (canvas.toBlob) {
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          const blobUrl = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = cleanFilename;
+          link.href = blobUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          setTimeout(() => {
+            URL.revokeObjectURL(blobUrl);
+          }, 4000);
+          return;
+        }
+
+        // Fallback to Data URL if Blob creation returns null
+        fallbackDataUrlDownload(canvas, mimeType, cleanFilename, format);
+      },
+      mimeType,
+      format === 'jpeg' ? 0.92 : 1.0
+    );
+  } else {
+    fallbackDataUrlDownload(canvas, mimeType, cleanFilename, format);
+  }
+}
+
+function fallbackDataUrlDownload(
+  canvas: HTMLCanvasElement,
+  mimeType: string,
+  filename: string,
+  format: 'png' | 'jpeg'
+) {
+  try {
+    const dataUrl = canvas.toDataURL(mimeType, format === 'jpeg' ? 0.92 : 1.0);
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (e) {
+    // If pop-up blocker or canvas tainted, open image in new tab for user to save
+    try {
+      const dataUrl = canvas.toDataURL(mimeType);
+      const win = window.open();
+      if (win) {
+        win.document.write(`<img src="${dataUrl}" style="max-width:100%;height:auto;"/>`);
+      }
+    } catch (err) {
+      alert('To download your photo on mobile, tap and hold the image preview to save it to your Photos!');
+    }
+  }
 }

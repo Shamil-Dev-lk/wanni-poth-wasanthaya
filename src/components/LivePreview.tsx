@@ -82,33 +82,33 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
   };
 
   return (
-    <section className="py-12 max-w-4xl mx-auto px-4 sm:px-6">
+    <section className="py-12 max-w-4xl mx-auto px-4 sm:px-6 font-sans">
       
       <div className="text-center max-w-lg mx-auto mb-8 space-y-2">
-        <span className="text-xs font-extrabold text-primary bg-primary-soft px-3 py-1 rounded-full uppercase">
+        <span className="text-xs font-semibold text-[#C3094A] bg-red-50 px-3 py-1 rounded-full uppercase border border-red-200">
           04 DOWNLOAD & SHARE
         </span>
-        <h2 className="text-3xl font-black text-text">
+        <h2 className="text-3xl font-bold text-gray-900">
           {t.previewTitle}
         </h2>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-gray-600 font-normal">
           {t.previewSubtitle}
         </p>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-border">
+      <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-gray-200">
         
         <div className="relative max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-lg border-2 border-gray-200 group">
           {previewDataUrl ? (
             <img
               src={previewDataUrl}
               alt="Final Campaign Photo Preview"
-              className="w-full h-full object-contain bg-gray-50"
+              className="w-full h-full object-contain bg-gray-50 cursor-pointer"
             />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-500 space-y-2">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="text-xs font-bold">Preparing final composition...</span>
+              <div className="w-8 h-8 border-4 border-[#C3094A] border-t-transparent rounded-full animate-spin" />
+              <span className="text-xs font-semibold">Preparing final composition...</span>
             </div>
           )}
 
@@ -126,11 +126,15 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
           )}
         </div>
 
-        <div className="mt-8 space-y-4 max-w-md mx-auto">
+        <p className="text-[11px] text-gray-400 text-center mt-3 font-normal">
+          💡 On mobile: Tap download buttons or tap and hold the image to save directly to Photos.
+        </p>
+
+        <div className="mt-6 space-y-4 max-w-md mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               onClick={() => handleDownload('png')}
-              className="w-full btn-primary-gradient text-white font-extrabold text-base py-4 px-4 rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-2 animate-pulse-red"
+              className="w-full btn-primary-red text-white font-semibold text-base py-3.5 px-4 rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2"
             >
               <Download className="w-5 h-5" />
               <span>{t.btnPng}</span>
@@ -138,7 +142,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
 
             <button
               onClick={() => handleDownload('jpeg')}
-              className="w-full bg-gray-900 hover:bg-black text-white font-bold text-base py-4 px-4 rounded-2xl shadow transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-gray-900 hover:bg-black text-white font-semibold text-base py-3.5 px-4 rounded-2xl shadow transition-all flex items-center justify-center space-x-2"
             >
               <Download className="w-5 h-5" />
               <span>{t.btnJpg}</span>
@@ -147,7 +151,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
 
           <button
             onClick={handleShare}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-3.5 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm py-3.5 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2"
           >
             <Share2 className="w-5 h-5" />
             <span>{t.btnShare}</span>
@@ -159,7 +163,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                 soundEffects.playClick();
                 onBackToEdit();
               }}
-              className="hover:text-primary flex items-center space-x-1 py-2 px-3 rounded-lg hover:bg-gray-50"
+              className="hover:text-[#C3094A] flex items-center space-x-1 py-2 px-3 rounded-lg hover:bg-gray-50"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>{t.btnReEdit}</span>
@@ -170,7 +174,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                 soundEffects.playClick();
                 onNewPhoto();
               }}
-              className="hover:text-primary flex items-center space-x-1 py-2 px-3 rounded-lg hover:bg-gray-50"
+              className="hover:text-[#C3094A] flex items-center space-x-1 py-2 px-3 rounded-lg hover:bg-gray-50"
             >
               <RefreshCw className="w-4 h-4" />
               <span>{t.btnNewPhoto}</span>
@@ -188,7 +192,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
                 soundEffects.playClick();
                 setFullscreen(false);
               }}
-              className="absolute -top-12 right-0 text-white font-bold text-sm bg-white/20 px-4 py-2 rounded-full hover:bg-white/40"
+              className="absolute -top-12 right-0 text-white font-semibold text-sm bg-white/20 px-4 py-2 rounded-full hover:bg-white/40"
             >
               ✕ Close
             </button>
