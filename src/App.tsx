@@ -19,6 +19,7 @@ import { Frame, ActiveStep } from './types/frame';
 import { presetFrames, defaultSamplePreviews } from './data/presetFrames';
 import { Language } from './utils/translations';
 import { soundEffects } from './utils/soundEffects';
+import { downloadCanvasImage } from './utils/canvasHelper';
 
 export const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('en');
@@ -265,19 +266,15 @@ export const App: React.FC = () => {
 
       <SuccessModal
         isOpen={showSuccessModal}
-        onClose={() => setShowAuthModal(false)}
+        onClose={() => setShowSuccessModal(false)}
         onDownloadPng={() => {
           if (activeComposedCanvas && selectedFrame) {
-            import('./utils/canvasHelper').then((m) =>
-              m.downloadCanvasImage(activeComposedCanvas, 'png', `wanni-poth-wasanthaya-${selectedFrame.id}.png`)
-            );
+            downloadCanvasImage(activeComposedCanvas, 'png', `wanni-poth-wasanthaya-${selectedFrame.id}.png`);
           }
         }}
         onDownloadJpg={() => {
           if (activeComposedCanvas && selectedFrame) {
-            import('./utils/canvasHelper').then((m) =>
-              m.downloadCanvasImage(activeComposedCanvas, 'jpeg', `wanni-poth-wasanthaya-${selectedFrame.id}.jpg`)
-            );
+            downloadCanvasImage(activeComposedCanvas, 'jpeg', `wanni-poth-wasanthaya-${selectedFrame.id}.jpg`);
           }
         }}
         onNewPhoto={() => {
