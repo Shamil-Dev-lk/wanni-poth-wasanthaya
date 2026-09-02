@@ -20,33 +20,40 @@ export const Hero: React.FC<HeroProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Auto-slide effect every 3.5 seconds
+  // Auto-slide effect every 3 seconds
   useEffect(() => {
     if (samplePreviews.length <= 1 || isHovered) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % samplePreviews.length);
-    }, 3500);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [samplePreviews, isHovered]);
 
   const handleNext = () => {
+    soundEffects.playClick();
     setCurrentIndex((prev) => (prev + 1) % samplePreviews.length);
   };
 
   const handlePrev = () => {
+    soundEffects.playClick();
     setCurrentIndex((prev) => (prev - 1 + samplePreviews.length) % samplePreviews.length);
   };
 
+  const handleDotClick = (idx: number) => {
+    soundEffects.playClick();
+    setCurrentIndex(idx);
+  };
+
   return (
-    <section id="hero" className="relative overflow-hidden bg-white pt-8 pb-16 lg:py-20 border-b border-gray-200/60">
+    <section id="hero" className="relative overflow-hidden bg-white pt-8 pb-16 lg:py-20 border-b border-gray-200/60 font-sans">
       
       {/* NPP Abstract Ambient Radial Glows */}
       <div className="ambient-blob-red" />
       <div className="ambient-blob-yellow" />
 
-      {/* Abstract Flowing Curve SVG Layer (NPP Red & Yellow Accents - 75% White, 20% Red, 5% Yellow) */}
+      {/* Abstract Flowing Curve SVG Layer */}
       <div className="npp-curve-layer">
         <svg viewBox="0 0 1440 600" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full object-cover">
           <path d="M-100 200 C300 400, 700 100, 1540 350 L1540 -100 L-100 -100 Z" fill="url(#nppRedGradient)" opacity="0.05" />
@@ -74,7 +81,7 @@ export const Hero: React.FC<HeroProps> = ({
               </span>
             </div>
 
-            {/* Main Campaign Title: Official Logo Image & Bold H1 */}
+            {/* Main Campaign Title */}
             <div className="space-y-3">
               <div className="flex justify-center lg:justify-start">
                 <img
@@ -99,7 +106,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <button
                 onClick={() => {
-                  if (soundEffects.enabled) soundEffects.playClick();
+                  soundEffects.playClick();
                   onStartClick();
                 }}
                 className="btn-primary-red w-full sm:w-auto flex items-center justify-center space-x-2.5 group"
@@ -110,7 +117,7 @@ export const Hero: React.FC<HeroProps> = ({
 
               <button
                 onClick={() => {
-                  if (soundEffects.enabled) soundEffects.playClick();
+                  soundEffects.playClick();
                   onExploreFrames();
                 }}
                 className="btn-secondary-outlined w-full sm:w-auto flex items-center justify-center space-x-2"
@@ -122,7 +129,7 @@ export const Hero: React.FC<HeroProps> = ({
 
           </div>
 
-          {/* Right Column: Floating Interactive Frame Preview Card */}
+          {/* Right Column: Sliding Sample Images Card */}
           <div className="lg:col-span-5 flex justify-center relative">
             
             {/* Ambient Floating Circles */}
@@ -156,57 +163,75 @@ export const Hero: React.FC<HeroProps> = ({
                   </span>
                 </div>
 
-                {/* Frame Preview Image */}
+                {/* Sliding Image Viewport */}
                 <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-200 shadow-inner group">
-                  {samplePreviews.map((imgSrc, idx) => (
-                    <div
-                      key={idx}
-                      className={`absolute inset-0 transition-all duration-700 ease-in-out transform ${
-                        idx === currentIndex
-                          ? 'opacity-100 scale-100 z-10'
-                          : 'opacity-0 scale-95 pointer-events-none'
-                      }`}
-                    >
-                      <img
-                        src={imgSrc}
-                        alt={`Official 2026 Campaign Frame ${idx + 1}`}
-                        className="w-full h-full object-contain p-1"
-                      />
-                    </div>
-                  ))}
+                  
+                  {/* Sliding Container */}
+                  <div
+                    className="flex w-full h-full transition-transform duration-500 ease-out"
+                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                  >
+                    {samplePreviews.map((imgSrc, idx) => (
+                      <div key={idx} className="w-full h-full flex-shrink-0 relative">
+                        <img
+                          src={imgSrc}
+                          alt={`Official Campaign Sample ${idx + 1}`}
+                          className="w-full h-full object-contain p-1"
+                        />
+                      </div>
+                    ))}
+                  </div>
 
-                  {/* Controls */}
+                  {/* Previous / Next Arrow Controls */}
                   {samplePreviews.length > 1 && (
                     <>
                       <button
                         onClick={handlePrev}
-                        className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-[#C3094A] text-white p-2 rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-md"
-                        title="Previous Frame"
+                        className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-[#C3094A] text-white p-2 rounded-full backdrop-blur-md transition-all shadow-md active:scale-95"
+                        title="Previous Sample"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
 
                       <button
                         onClick={handleNext}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-[#C3094A] text-white p-2 rounded-full backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-md"
-                        title="Next Frame"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 bg-black/60 hover:bg-[#C3094A] text-white p-2 rounded-full backdrop-blur-md transition-all shadow-md active:scale-95"
+                        title="Next Sample"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     </>
                   )}
 
-                  {/* Indicator Badge */}
+                  {/* Indicator Counter Badge */}
                   <div className="absolute bottom-2.5 right-2.5 z-20 bg-black/75 text-white text-[10px] font-bold px-3 py-1 rounded-full backdrop-blur-md font-sans">
-                    Frame 0{currentIndex + 1} / 0{samplePreviews.length}
+                    Sample 0{currentIndex + 1} / 0{samplePreviews.length}
                   </div>
                 </div>
+
+                {/* Clickable Pagination Dots */}
+                {samplePreviews.length > 1 && (
+                  <div className="flex justify-center items-center space-x-2 pt-1">
+                    {samplePreviews.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleDotClick(idx)}
+                        className={`h-2.5 rounded-full transition-all duration-300 ${
+                          idx === currentIndex
+                            ? 'w-7 bg-[#C3094A]'
+                            : 'w-2.5 bg-gray-300 hover:bg-gray-400'
+                        }`}
+                        title={`Go to Sample ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                )}
 
                 {/* Card Action Button */}
                 <div className="pt-1">
                   <button
                     onClick={() => {
-                      if (soundEffects.enabled) soundEffects.playClick();
+                      soundEffects.playClick();
                       onStartClick();
                     }}
                     className="w-full py-2.5 bg-[#C3094A] hover:bg-[#8B0000] text-white font-semibold text-sm rounded-xl shadow-xs transition-colors flex items-center justify-center space-x-2 font-sans"
