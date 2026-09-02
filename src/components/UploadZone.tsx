@@ -25,14 +25,16 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const processFile = (file: File) => {
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type.toLowerCase())) {
+    // Mobile file type validation (allow image/*, empty type for iOS camera uploads, and standard formats)
+    const isImageType = !file.type || file.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|heic|heif)$/i.test(file.name);
+    
+    if (!isImageType) {
       soundEffects.playRejected();
       onError(t.errType);
       return;
     }
 
-    const maxSizeMB = 15;
+    const maxSizeMB = 25; // High-res mobile camera support up to 25MB
     if (file.size > maxSizeMB * 1024 * 1024) {
       soundEffects.playRejected();
       onError(t.errSize);
@@ -42,23 +44,39 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
     soundEffects.playUpload();
     setLoading(true);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new Image();
-      img.onload = () => {
-        setLoading(false);
-        onImageSelected(img, file);
-      };
-      img.onerror = () => {
-        setLoading(false);
-        soundEffects.playRejected();
-        onError(t.errType);
-      };
-      if (event.target?.result) {
-        img.src = event.target.result as string;
-      }
+    // Fast Object URL loading for mobile browsers
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    
+    img.onload = () => {
+      setLoading(false);
+      onImageSelected(img, file);
+      // Clean up object URL after load
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 2000);
     };
-    reader.readAsDataURL(file);
+
+    img.onerror = () => {
+      // Fallback to FileReader if Object URL fails
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => {
+          setLoading(false);
+          onImageSelected(fallbackImg, file);
+        };
+        fallbackImg.onerror = () => {
+          setLoading(false);
+          soundEffects.playRejected();
+          onError(t.errType);
+        };
+        if (event.target?.result) {
+          fallbackImg.src = event.target.result as string;
+        }
+      };
+      reader.readAsDataURL(file);
+    };
+
+    img.src = objectUrl;
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -69,35 +87,45 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      processFile(e.target.files[0]);
+    }
+  };
+
   return (
-    <section className="py-12 max-w-4xl mx-auto px-4 sm:px-6">
-      <div className="flex items-center justify-between mb-8">
+    <section className="py-8 sm:py-12 max-w-4xl mx-auto px-4 sm:px-6 font-sans">
+      
+      {/* Header controls */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <button
           onClick={() => {
             soundEffects.playClick();
             onBackToGallery();
           }}
-          className="text-gray-600 hover:text-primary font-semibold text-sm flex items-center space-x-2 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm transition-all"
+          className="text-gray-600 hover:text-[#C3094A] font-semibold text-sm flex items-center space-x-2 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-2xs transition-all w-fit"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{t.changeFrame}</span>
         </button>
 
-        <div className="flex items-center space-x-2 bg-primary-soft text-primary text-xs font-bold px-3 py-1.5 rounded-full">
+        <div className="flex items-center space-x-2 bg-red-50 text-[#C3094A] text-xs font-semibold px-3.5 py-1.5 rounded-full border border-red-200">
           <span>{t.selectedFrameLabel}: {selectedFrame.name}</span>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-border">
-        <div className="text-center max-w-lg mx-auto mb-8 space-y-2">
-          <h2 className="text-3xl font-black text-text">
+      <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-gray-200">
+        
+        <div className="text-center max-w-lg mx-auto mb-6 space-y-2">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
             {t.uploadTitle}
           </h2>
-          <p className="text-sm text-muted">
+          <p className="text-sm text-gray-600 font-normal">
             {t.uploadSubtitle}
           </p>
         </div>
 
+        {/* Upload Container Zone */}
         <div
           onDragOver={(e) => {
             e.preventDefault();
@@ -107,54 +135,54 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
           onDrop={handleDrop}
           onClick={() => {
             soundEffects.playClick();
-            fileInputRef.current?.click();
+            if (fileInputRef.current) {
+              fileInputRef.current.value = ''; // Reset value so re-selecting same photo triggers onChange
+              fileInputRef.current.click();
+            }
           }}
-          className={`relative border-3 border-dashed rounded-3xl p-8 sm:p-14 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center space-y-4 ${
+          className={`relative border-2 border-dashed rounded-3xl p-6 sm:p-12 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center space-y-4 ${
             isDragging
-              ? 'border-primary bg-primary-soft/50 scale-[1.01]'
-              : 'border-gray-300 hover:border-primary/60 bg-gray-50/80 hover:bg-white'
+              ? 'border-[#C3094A] bg-red-50/50 scale-[1.01]'
+              : 'border-gray-300 hover:border-[#C3094A]/60 bg-gray-50/80 hover:bg-white'
           }`}
         >
+          {/* Universal Mobile Image Input (accept="image/*" for iPhone Camera + Gallery) */}
           <input
             type="file"
             ref={fileInputRef}
-            onChange={(e) => {
-              if (e.target.files && e.target.files[0]) {
-                processFile(e.target.files[0]);
-              }
-            }}
-            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFileChange}
+            accept="image/*,.jpg,.jpeg,.png,.webp,.heic,.heif"
             className="hidden"
           />
 
           {loading ? (
             <div className="py-8 space-y-3">
-              <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
-              <p className="text-base font-bold text-primary">{t.processingPhoto}</p>
+              <Loader2 className="w-12 h-12 text-[#C3094A] animate-spin mx-auto" />
+              <p className="text-base font-semibold text-[#C3094A]">{t.processingPhoto}</p>
             </div>
           ) : (
             <>
-              <div className="w-20 h-20 rounded-full bg-primary-soft text-primary flex items-center justify-center shadow-inner">
-                <Upload className="w-10 h-10 text-primary animate-bounce" />
+              <div className="w-20 h-20 rounded-full bg-red-50 text-[#C3094A] flex items-center justify-center shadow-inner">
+                <Upload className="w-10 h-10 text-[#C3094A] animate-bounce" />
               </div>
 
               <div>
                 <h3 className="text-xl font-bold text-gray-900 mb-1">
                   {t.dragDrop}
                 </h3>
-                <p className="text-xs text-gray-500">{t.orSelect}</p>
+                <p className="text-xs text-gray-500 font-normal">{t.orSelect}</p>
               </div>
 
               <button
                 type="button"
-                className="bg-primary hover:bg-primary-dark text-white font-bold text-base px-8 py-3.5 rounded-xl shadow transition-all flex items-center space-x-2"
+                className="bg-[#C3094A] hover:bg-[#8B0000] text-white font-semibold text-base px-8 py-3.5 rounded-xl shadow transition-all flex items-center space-x-2 active:scale-98"
               >
                 <Camera className="w-5 h-5" />
                 <span>{t.btnSelectPhoto}</span>
               </button>
 
-              <div className="pt-2 text-[11px] text-gray-400 font-medium">
-                {t.supportedFormats}
+              <div className="pt-2 text-[11px] text-gray-400 font-normal">
+                Supported Formats: Camera Photo • JPG • PNG • WebP • HEIC (Max 25MB)
               </div>
             </>
           )}
@@ -162,7 +190,7 @@ export const UploadZone: React.FC<UploadZoneProps> = ({
         </div>
 
         <div className="mt-6 text-center text-xs text-gray-500 flex items-center justify-center space-x-1.5 bg-gray-50 py-2.5 rounded-xl">
-          <FileCheck className="w-4 h-4 text-green-600" />
+          <FileCheck className="w-4 h-4 text-emerald-600" />
           <span>{t.privacyNote}</span>
         </div>
 
