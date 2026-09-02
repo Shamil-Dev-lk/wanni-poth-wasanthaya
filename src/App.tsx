@@ -33,10 +33,17 @@ export const App: React.FC = () => {
     soundEffects.enabled = true;
   }, []);
 
+  // Ensure exactly 3 official campaign frames are loaded by default
   const [frames, setFrames] = useState<Frame[]>(() => {
     try {
       const saved = localStorage.getItem('nikaweratiya_ps_frames');
-      return saved ? JSON.parse(saved) : presetFrames;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length === 3) {
+          return parsed;
+        }
+      }
+      return presetFrames;
     } catch {
       return presetFrames;
     }

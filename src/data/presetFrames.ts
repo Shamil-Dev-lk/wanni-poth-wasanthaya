@@ -51,23 +51,6 @@ export const PRESET_FRAMES: Frame[] = [
     },
     description: 'Clean circular cutout frame design for library book donation supporters.',
     badge: 'Popular'
-  },
-  {
-    id: 'wanni-badge-2026',
-    name: 'Nikaweratiya PS Badge Frame 2026',
-    category: 'Official Frames 2026',
-    image: '/assets/frames/wanni-frame-2026-badge.png',
-    enabled: true,
-    photoArea: {
-      x: 115,
-      y: 115,
-      width: 850,
-      height: 850,
-      radius: 425,
-      shape: 'circle'
-    },
-    description: 'Classic circular campaign frame featuring "දිවි ඇතිතුරු අකුරු මිතුරු".',
-    badge: 'Classic'
   }
 ];
 
