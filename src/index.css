@@ -1,0 +1,286 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font Face Definitions for Aragalaya & FM Sandhyani */
+@font-face {
+  font-family: 'Aragalaya';
+  src: url('/fonts/Aragalaya.woff2') format('woff2'),
+       url('/fonts/Aragalaya.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'FMSandhyani';
+  src: url('/fonts/FMSandhyani.woff2') format('woff2'),
+       url('/fonts/FMSandhyani.ttf') format('truetype'),
+       url('/fonts/FM-Sandhyani.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --npp-red-primary: #C3094A;
+  --npp-red-deep: #8B0000;
+  --npp-red-strong: #C00000;
+  --npp-yellow: #FFD400;
+  --npp-dark: #111111;
+  --text-dark: #1F2937;
+  --text-muted: #6B7280;
+  --bg-app: #FFFFFF;
+  --bg-alt: #FAFAFA;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+body {
+  font-family: 'Noto Sans Sinhala', 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-dark);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Classes */
+.font-sinhala-serif {
+  font-family: 'Noto Serif Sinhala', serif;
+}
+
+.font-sinhala-sans {
+  font-family: 'Noto Sans Sinhala', system-ui, sans-serif;
+}
+
+.font-aragalaya {
+  font-family: 'Aragalaya', 'Noto Sans Sinhala', system-ui, sans-serif;
+}
+
+.font-sandhyani {
+  font-family: 'FMSandhyani', 'FM Sandhyani', 'Noto Sans Sinhala', system-ui, sans-serif;
+}
+
+/* Typography Hierarchy Standards */
+h1 {
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: normal !important;
+}
+
+h2 {
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: normal !important;
+}
+
+h3 {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+p, span, label {
+  font-weight: 400;
+}
+
+/* Header Floating Navigation (Light, Non-Bold, Medium weight 400-500) */
+.header-floating {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(229, 231, 235, 0.9);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.nav-link {
+  font-family: 'Noto Sans Sinhala', 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #374151;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #C3094A;
+  font-weight: 600;
+}
+
+/* Primary Button Design (#C3094A, rounded 14px, medium/semi-bold weight 500-600) */
+.btn-primary-red {
+  background-color: #C3094A;
+  color: #FFFFFF;
+  border-radius: 14px;
+  height: 48px;
+  padding: 0 24px;
+  font-family: 'Noto Sans Sinhala', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 14px rgba(195, 9, 74, 0.28);
+}
+
+.btn-primary-red:hover {
+  background-color: #8B0000;
+  box-shadow: 0 8px 22px rgba(139, 0, 0, 0.38);
+  transform: translateY(-2px);
+}
+
+.btn-primary-red:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Secondary Button Design (White background, Red border, medium weight) */
+.btn-secondary-outlined {
+  background-color: #FFFFFF;
+  color: #C3094A;
+  border: 2px solid #C3094A;
+  border-radius: 14px;
+  height: 48px;
+  padding: 0 22px;
+  font-family: 'Noto Sans Sinhala', 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary-outlined:hover {
+  background-color: #FDF2F5;
+  transform: translateY(-2px);
+}
+
+.btn-secondary-outlined:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* NPP Abstract Ambient Background System */
+@keyframes nppRedFlow {
+  0% { transform: translate(0px, 0px) rotate(0deg) scale(1); }
+  50% { transform: translate(45px, 25px) rotate(4deg) scale(1.06); }
+  100% { transform: translate(0px, 0px) rotate(0deg) scale(1); }
+}
+
+@keyframes nppYellowGlow {
+  0% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(-30px, 20px) scale(1.08); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.ambient-blob-red {
+  position: absolute;
+  top: 3%;
+  left: 2%;
+  width: 600px;
+  height: 500px;
+  background: radial-gradient(ellipse at center, rgba(195, 9, 74, 0.07) 0%, rgba(139, 0, 0, 0.03) 50%, rgba(255, 255, 255, 0) 75%);
+  animation: nppRedFlow 24s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-blob-yellow {
+  position: absolute;
+  top: 15%;
+  right: 2%;
+  width: 500px;
+  height: 400px;
+  background: radial-gradient(circle at center, rgba(255, 212, 0, 0.09) 0%, rgba(255, 255, 255, 0) 70%);
+  animation: nppYellowGlow 28s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.npp-curve-layer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+}
+
+/* Animations */
+@keyframes floatElementSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+@keyframes floatElementDelay {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(8px) rotate(-2deg); }
+}
+
+.animate-float-slow {
+  animation: floatElementSlow 6s ease-in-out infinite;
+}
+
+.animate-float-delay {
+  animation: floatElementDelay 7s ease-in-out infinite 1.5s;
+}
+
+@keyframes fadeInUpStagger {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeInUpStagger 0.5s ease-out forwards;
+}
+
+@keyframes fadeInSimple {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeInSimple 0.25s ease-out forwards;
+}
+
+@keyframes scaleInSimple {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-scale-in {
+  animation: scaleInSimple 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ambient-blob-red,
+  .ambient-blob-yellow {
+    animation: none !important;
+  }
+}
