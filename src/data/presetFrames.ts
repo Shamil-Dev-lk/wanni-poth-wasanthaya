@@ -74,7 +74,9 @@ export const PRESET_FRAMES: Frame[] = [
 export const presetFrames = PRESET_FRAMES;
 
 export const defaultSamplePreviews: string[] = [
-  '/assets/hero-sample.png'
+  '/assets/sample-1.jpg',
+  '/assets/sample-2.jpg',
+  '/assets/sample-3.jpg'
 ];
 
 export function generatePresetFrameOverlay(frameId: string): string {
