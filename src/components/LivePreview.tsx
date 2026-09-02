@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Frame } from '../types/frame';
 import { downloadCanvasImage } from '../utils/canvasHelper';
-import { Download, Share2, ArrowLeft, Maximize2, RefreshCw } from 'lucide-react';
+import { Download, Share2, ArrowLeft, Maximize2, RefreshCw, X, Copy, Check, MessageCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Language, translations } from '../utils/translations';
 import { soundEffects } from '../utils/soundEffects';
@@ -25,7 +25,15 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
 }) => {
   const t = translations[language];
   const [fullscreen, setFullscreen] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const [previewDataUrl, setPreviewDataUrl] = useState<string>('');
+
+  const shareUrl = window.location.href.includes('localhost')
+    ? 'https://wanni-poth-wasanthaya.vercel.app/'
+    : window.location.href;
+
+  const shareText = '“දිවි ඇතිතුරු අකුරු මිතුරු” — Create your official customized campaign photo for Wanni Poth Wasanthaya 2026 (Nikaweratiya Pradeshiya Sabha)';
 
   useEffect(() => {
     if (canvasRef) {
@@ -58,27 +66,36 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
     onSuccess();
   };
 
-  const handleShare = async () => {
-    if (!canvasRef) return;
+  const handleShareClick = async () => {
     soundEffects.playClick();
+    if (!canvasRef) {
+      setShowShareModal(true);
+      return;
+    }
+
     try {
       canvasRef.toBlob(async (blob) => {
-        if (!blob) return;
-        const file = new File([blob], 'wanni-poth-wasanthaya.png', { type: 'image/png' });
-        
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        if (blob && navigator.canShare && navigator.canShare({ files: [new File([blob], 'wanni-poth-wasanthaya.png', { type: 'image/png' })] })) {
+          const file = new File([blob], 'wanni-poth-wasanthaya.png', { type: 'image/png' });
           await navigator.share({
             title: t.psName,
-            text: t.slogan,
+            text: shareText,
             files: [file]
           });
         } else {
-          handleDownload('png');
+          setShowShareModal(true);
         }
       });
     } catch (e) {
-      handleDownload('png');
+      setShowShareModal(true);
     }
+  };
+
+  const copyShareLink = () => {
+    soundEffects.playClick();
+    navigator.clipboard.writeText(shareUrl);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 3000);
   };
 
   return (
@@ -131,7 +148,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
           💡 On mobile: Tap download buttons or tap and hold the image to save directly to Photos.
         </p>
 
-        {/* Download Buttons Section */}
+        {/* Action Buttons Section */}
         <div className="mt-6 space-y-4 max-w-md mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
@@ -152,8 +169,8 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
           </div>
 
           <button
-            onClick={handleShare}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm sm:text-base py-3.5 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2 min-h-[48px]"
+            onClick={handleShareClick}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm sm:text-base py-3.5 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2 min-h-[48px] active:scale-98"
           >
             <Share2 className="w-5 h-5 flex-shrink-0" />
             <span>Share to Social Media</span>
@@ -186,6 +203,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
 
       </div>
 
+      {/* Fullscreen HD Preview Modal */}
       {fullscreen && previewDataUrl && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
           <div className="relative max-w-2xl w-full">
@@ -203,6 +221,102 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
               alt="Fullscreen HD Preview"
               className="w-full h-auto rounded-2xl shadow-2xl border-2 border-white/20 max-h-[85vh] object-contain mx-auto"
             />
+          </div>
+        </div>
+      )}
+
+      {/* Social Media Sharing Modal */}
+      {showShareModal && (
+        <div
+          onClick={() => setShowShareModal(false)}
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl relative border border-gray-200 text-center space-y-6 animate-scale-in cursor-default font-sans"
+          >
+            <button
+              onClick={() => setShowShareModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header */}
+            <div className="space-y-2">
+              <span className="text-xs font-semibold text-[#C3094A] uppercase tracking-wider">
+                Official Campaign 2026
+              </span>
+              <h3 className="text-2xl font-bold text-gray-900">
+                Share Campaign Photo
+              </h3>
+              <p className="text-xs text-gray-600 font-normal">
+                Choose a social platform or copy link with official preview thumbnail.
+              </p>
+            </div>
+
+            {/* Generated Photo Thumbnail */}
+            {previewDataUrl && (
+              <div className="w-36 h-36 mx-auto rounded-2xl overflow-hidden shadow-md border-2 border-gray-200">
+                <img src={previewDataUrl} alt="Campaign Share Preview" className="w-full h-full object-cover" />
+              </div>
+            )}
+
+            {/* Social Share Grid */}
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              
+              {/* WhatsApp */}
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareText}\n${shareUrl}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => soundEffects.playClick()}
+                className="py-3 px-4 bg-[#25D366] hover:bg-[#20bd5a] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center space-x-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>WhatsApp</span>
+              </a>
+
+              {/* Facebook */}
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => soundEffects.playClick()}
+                className="py-3 px-4 bg-[#1877F2] hover:bg-[#166fe5] text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center space-x-2"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Facebook</span>
+              </a>
+
+              {/* Twitter / X */}
+              <a
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => soundEffects.playClick()}
+                className="py-3 px-4 bg-black hover:bg-gray-800 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center space-x-2"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Twitter / X</span>
+              </a>
+
+              {/* Copy Link */}
+              <button
+                onClick={copyShareLink}
+                className="py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs sm:text-sm rounded-xl transition-all flex items-center justify-center space-x-2 border border-gray-200"
+              >
+                {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-gray-600" />}
+                <span>{copiedLink ? 'Copied Link!' : 'Copy Link'}</span>
+              </button>
+
+            </div>
+
+            {/* Campaign Slogan Footer */}
+            <p className="text-xs font-semibold text-[#C3094A] pt-2 border-t border-gray-100 font-sinhala-serif">
+              “දිවි ඇතිතුරු අකුරු මිතුරු” • Nikaweratiya Pradeshiya Sabha
+            </p>
+
           </div>
         </div>
       )}
