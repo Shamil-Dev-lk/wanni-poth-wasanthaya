@@ -20,11 +20,14 @@ export const FrameGallery: React.FC<FrameGalleryProps> = ({
   const t = translations[language];
   const [activeCategory, setActiveCategory] = useState<string>(t.catAll);
 
-  const categories = [t.catAll, ...Array.from(new Set(frames.map((f) => f.category)))];
+  // Guarantee maximum 3 official campaign frames
+  const displayFrames = frames.filter((f) => f.enabled).slice(0, 3);
+
+  const categories = [t.catAll, ...Array.from(new Set(displayFrames.map((f) => f.category)))];
 
   const filteredFrames = activeCategory === t.catAll
-    ? frames.filter((f) => f.enabled)
-    : frames.filter((f) => f.enabled && f.category === activeCategory);
+    ? displayFrames
+    : displayFrames.filter((f) => f.category === activeCategory);
 
   const handleFrameClick = (frame: Frame) => {
     if (soundEffects.enabled) soundEffects.playFrameSelect();
@@ -32,7 +35,7 @@ export const FrameGallery: React.FC<FrameGalleryProps> = ({
   };
 
   return (
-    <section id="gallery" className="py-20 bg-[#FAFAFA] border-b border-gray-200/80">
+    <section id="gallery" className="py-20 bg-[#FAFAFA] border-b border-gray-200/80 font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Heading */}
@@ -76,7 +79,7 @@ export const FrameGallery: React.FC<FrameGalleryProps> = ({
             <h3 className="text-lg font-semibold text-gray-800">{t.noFrames}</h3>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {filteredFrames.map((frame) => {
               const isSelected = selectedFrame?.id === frame.id;
 
