@@ -132,15 +132,27 @@ export const App: React.FC = () => {
     setShowSuccessModal(true);
   };
 
+  const scrollToGallery = () => {
+    setIsAdminView(false);
+    setActiveStep('frame');
+    setTimeout(() => {
+      const galleryEl = document.getElementById('gallery');
+      if (galleryEl) {
+        galleryEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        const workflowEl = document.getElementById('workflow');
+        if (workflowEl) {
+          workflowEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }, 50);
+  };
+
   const scrollToSection = (id: string) => {
     setActiveSection(id);
 
-    if (id === 'gallery') {
-      setActiveStep('frame');
-      const el = document.getElementById('workflow');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    if (id === 'gallery' || id === 'frames' || id === 'workflow') {
+      scrollToGallery();
       return;
     }
 
@@ -160,20 +172,11 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleStartFlow = () => {
-    setIsAdminView(false);
-    if (!selectedFrame) {
-      setSelectedFrame(presetFrames[0]);
-    }
-    setActiveStep('frame');
-    scrollToSection('workflow');
-  };
-
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#1F2937] flex flex-col font-sans selection:bg-[#E31E24] selection:text-white">
       
       <Header
-        onStartClick={handleStartFlow}
+        onStartClick={scrollToGallery}
         onNavigate={(id) => {
           setIsAdminView(false);
           scrollToSection(id);
@@ -196,11 +199,8 @@ export const App: React.FC = () => {
         ) : (
           <>
             <Hero
-              onStartClick={handleStartFlow}
-              onExploreFrames={() => {
-                setActiveStep('frame');
-                scrollToSection('workflow');
-              }}
+              onStartClick={scrollToGallery}
+              onExploreFrames={scrollToGallery}
               samplePreviews={samplePreviews}
               language={language}
             />
@@ -213,7 +213,7 @@ export const App: React.FC = () => {
 
             <div id="about" className="scroll-mt-24">
               <AboutCampaign
-                onStartClick={handleStartFlow}
+                onStartClick={scrollToGallery}
               />
             </div>
 
@@ -272,11 +272,8 @@ export const App: React.FC = () => {
             </div>
 
             <CallToAction
-              onStartClick={handleStartFlow}
-              onExploreFrames={() => {
-                setActiveStep('frame');
-                scrollToSection('workflow');
-              }}
+              onStartClick={scrollToGallery}
+              onExploreFrames={scrollToGallery}
             />
           </>
         )}
