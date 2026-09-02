@@ -98,6 +98,7 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
 
       <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-gray-200">
         
+        {/* Preview Frame Container */}
         <div className="relative max-w-md mx-auto aspect-square rounded-2xl overflow-hidden shadow-lg border-2 border-gray-200 group">
           {previewDataUrl ? (
             <img
@@ -130,31 +131,32 @@ export const LivePreview: React.FC<LivePreviewProps> = ({
           💡 On mobile: Tap download buttons or tap and hold the image to save directly to Photos.
         </p>
 
+        {/* Download Buttons Section */}
         <div className="mt-6 space-y-4 max-w-md mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button
               onClick={() => handleDownload('png')}
-              className="w-full btn-primary-red text-white font-semibold text-base py-3.5 px-4 rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-[#C3094A] hover:bg-[#8B0000] text-white font-semibold text-sm sm:text-base py-3.5 px-4 rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 whitespace-nowrap min-h-[48px] active:scale-98"
             >
-              <Download className="w-5 h-5" />
-              <span>{t.btnPng}</span>
+              <Download className="w-4.5 h-4.5 flex-shrink-0" />
+              <span>Download PNG</span>
             </button>
 
             <button
               onClick={() => handleDownload('jpeg')}
-              className="w-full bg-gray-900 hover:bg-black text-white font-semibold text-base py-3.5 px-4 rounded-2xl shadow transition-all flex items-center justify-center space-x-2"
+              className="w-full bg-gray-900 hover:bg-black text-white font-semibold text-sm sm:text-base py-3.5 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2 whitespace-nowrap min-h-[48px] active:scale-98"
             >
-              <Download className="w-5 h-5" />
-              <span>{t.btnJpg}</span>
+              <Download className="w-4.5 h-4.5 flex-shrink-0" />
+              <span>Download JPG</span>
             </button>
           </div>
 
           <button
             onClick={handleShare}
-            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm py-3.5 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2"
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm sm:text-base py-3.5 px-4 rounded-xl shadow transition-all flex items-center justify-center space-x-2 min-h-[48px]"
           >
-            <Share2 className="w-5 h-5" />
-            <span>{t.btnShare}</span>
+            <Share2 className="w-5 h-5 flex-shrink-0" />
+            <span>Share to Social Media</span>
           </button>
 
           <div className="pt-4 border-t border-gray-100 flex items-center justify-between text-xs font-semibold text-gray-600">
